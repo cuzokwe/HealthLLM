@@ -22,18 +22,3 @@ try:
 
 except:
     pass
-
-# create vectorstore in Pinecone and load it with OpenAIEmbeddings
-embeddings = OpenAIEmbeddings()
-documents = load_documents(["./research"])  # dataloader
-vectorstore = PineconeVectorStore.from_documents(documents, index_name='health-research-index', embedding=embeddings)
-
-# start LLM attached to OpenAI backend
-llm = OpenAI()
-qa_chain = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=vectorstore.as_retriever())
-
-# query
-query = "What are some benefits of fasting?"
-result = qa_chain.run(query)
-
-print(result)
