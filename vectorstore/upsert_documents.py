@@ -38,5 +38,5 @@ def upload_file_to_vectorstore(file_path: str, pinecone_index: str = 'health-res
     vectorstore.add_documents(docs)
 
 # Example usage
-upload_file_to_vectorstore("path/to/file.pdf", "health-research-index")
-upload_file_to_vectorstore("path/to/text_file.txt", "health-research-index", chunk_size=500, chunk_overlap=50)
+# upload_file_to_vectorstore("path/to/file.pdf", "health-research-index")
+# upload_file_to_vectorstore("path/to/text_file.txt", "health-research-index", chunk_size=500, chunk_overlap=50)
