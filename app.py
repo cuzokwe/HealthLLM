@@ -1,35 +1,39 @@
-from langchain_community.embeddings.openai import OpenAIEmbeddings
-from langchain_community.vectorstores import Pinecone
-from langchain_community.llms import OpenAI
+from langchain_pinecone import PineconeVectorStore
+from langchain_openai import OpenAIEmbeddings, OpenAI
 from langchain.chains import RetrievalQA
-import pinecone
+from pinecone import Pinecone, ServerlessSpec
 
-# Initialize Pinecone
-pinecone.init(api_key="your_pinecone_api_key", environment="your_pinecone_environment")
+from docs import load_documents
+import os
 
-# Create an index in Pinecone
-index_name = "your_index_name"
-pinecone.create_index(index_name, dimension=1536)  # Dimension of OpenAI embeddings
+# start pinecone & create index
+pc = Pinecone(api_key=os.environ['PINECONE_API_KEY'])
 
-# Initialize OpenAI embeddings
+try:
+    pc.create_index(
+        name="health-research-index",
+        dimension=1536,  # Replace with your model dimensions
+        metric="euclidean",  # Replace with your model metric
+        spec=ServerlessSpec(
+            cloud="aws",
+            region="us-east-1"
+        )
+    )
+
+except:
+    pass
+
+# create vectorstore in Pinecone and load it with OpenAIEmbeddings
 embeddings = OpenAIEmbeddings()
+documents = load_documents(["./research"])  # dataloader
+vectorstore = PineconeVectorStore.from_documents(documents, index_name='health-research-index', embedding=embeddings)
 
-# Load and process your documents
-documents = [
-    # Your document data goes here
-]
-
-# Create a Pinecone vectorstore and store document embeddings
-vectorstore = Pinecone.from_documents(documents, embeddings, index_name=index_name)
-
-# Initialize OpenAI LLM
+# start LLM attached to OpenAI backend
 llm = OpenAI()
-
-# Create a retrieval-augmented QA chain
 qa_chain = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=vectorstore.as_retriever())
 
-# Query the LLM
-query = "Your question goes here"
+# query
+query = "What are some benefits of fasting?"
 result = qa_chain.run(query)
 
 print(result)
