@@ -8,7 +8,8 @@ import os
 
 def generate_response(input_text):
     embeddings = OpenAIEmbeddings()
-    vectorstore = PineconeVectorStore(index_name='health-research-index', embedding=embeddings)
+    print(st.session_state.user)
+    vectorstore = PineconeVectorStore(index_name='health-research-index', namespace=st.session_state.user, embedding=embeddings)
     llm = ChatOpenAI(openai_api_key=os.environ['OPENAI_API_KEY'], temperature=0.0)
     qa_chain = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=vectorstore.as_retriever())
     print(input_text)
@@ -17,6 +18,9 @@ def generate_response(input_text):
 
 def main():
     st.title('🦜🔗 Quickstart App')
+
+    if "user" not in st.session_state:
+        st.session_state.user = 'user1'
 
     with st.form('my_form'):
         text = st.text_area('Enter text:', 'What are some ways I can increase my metabolism?')

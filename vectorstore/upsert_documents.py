@@ -4,6 +4,8 @@ from langchain.document_loaders import PyPDFLoader, TextLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
+from pinecone import Pinecone, ServerlessSpec
+import streamlit as st
 
 def upload_file_to_vectorstore(file_path: str, pinecone_index: str = 'health-research-index', chunk_size: int = 1000, chunk_overlap: int = 0):
     """
@@ -18,9 +20,13 @@ def upload_file_to_vectorstore(file_path: str, pinecone_index: str = 'health-res
     Returns:
         None
     """
+
+    pc = Pinecone(api_key=os.environ['PINECONE_API_KEY'])
+    index = pc.Index(pinecone_index)
+
     # Initialize the vector store and embeddings
     embeddings = OpenAIEmbeddings()
-    vectorstore = PineconeVectorStore(index=pinecone_index, embedding=embeddings)
+    vectorstore = PineconeVectorStore(index=index, namespace=st.session_state.user, embedding=embeddings)
 
     # Determine the file type and load the file
     _, file_extension = os.path.splitext(file_path)
