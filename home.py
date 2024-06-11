@@ -13,8 +13,8 @@ st.title('🦜🔗 Quickstart App')
 openai_api_key = st.sidebar.text_input('OpenAI API Key', type='password')
 
 def generate_response(input_text):
-
-    vectorstore = PineconeVectorStore(index_name='health-research-index')
+    embeddings = OpenAIEmbeddings()
+    vectorstore = PineconeVectorStore(index_name='health-research-index', embedding=embeddings)
     llm = OpenAI(temperature=0.7, openai_api_key=openai_api_key)
     qa_chain = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=vectorstore.as_retriever())
     st.info(qa_chain.run(input_text))
