@@ -5,3 +5,4 @@ langchain-openai
 openai
 pinecone-client
 PyPDF2
+streamlit
