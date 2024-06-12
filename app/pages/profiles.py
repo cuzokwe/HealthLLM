@@ -2,20 +2,30 @@
 
 import streamlit as st
 
+# Simple session state Initialization logic
+if 'user' in st.session_state:
+    pass
+else:
+    st.session_state.user = None
+
 user = st.selectbox(
-    "Change User",
-    ("User 1", "User 2"))
+    label="Change User",
+    options=("User 1", "User 2"),
+    index=None) # Initialize selectbox to none
+
+if user is not None:
+    st.session_state.user = user
 
 st.write("You are currently:", st.session_state.user)
 
-if user is not None:
-    if user == 'User 1':
+if st.session_state.user is not None:
+    if st.session_state.user == 'User 1':
         st.success('User 1 Profile Selected')
         st.session_state.user = 'user1'
         # switch index namespace
 
         pass
-    if user == 'User 2':
+    if st.session_state.user == 'User 2':
         st.success('User 2 Profile Selected')
         st.session_state.user = 'user2'
         # switch index namespace
